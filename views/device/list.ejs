@@ -1,0 +1,72 @@
+<%- include('../partials/header') %>
+
+    <div class="dashboard-main-body">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+            <h6 class="fw-semibold mb-0">List</h6>
+            <ul class="d-flex align-items-center gap-2">
+                <li class="fw-medium">
+                    <a href="index.php" class="d-flex align-items-center gap-1 hover-text-primary">
+                        <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+                        Device
+                    </a>
+                </li>
+                <li>-</li>
+                <li class="fw-medium">List</li>
+            </ul>
+        </div>
+
+        <div class="row gy-4">
+            <% if (session) { %>
+                <% session.forEach(session => { %>
+                    <div class="col-xxl-6">
+                        <div class="card radius-12 shadow-none border overflow-hidden">
+                            <div class="card-header bg-neutral-100 border-bottom py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
+                                <div class="d-flex align-items-center gap-10">
+                                    <span class="text-lg fw-semibold text-primary-light"><%= session.packageName%> <%= session.packageDuration%> Hari (<%= session.botName%>)</span>
+                                </div>
+                            </div>
+                            <div class="card-body p-24">
+                                <div class="row gy-3">
+                                    <div class="col-sm-6">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="d-flex">
+                                                <iconify-icon icon="fluent:phone-chat-16-regular" class="text-xl"></iconify-icon>
+                                            </span>
+                                            <b><%= session.botPhoneNumber%></b>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="d-flex">
+                                                <iconify-icon icon="material-symbols:circle" class="text-xl <%= session.waStatus === 'Disconnected' ? 'text-danger' : 'text-success' %>"></iconify-icon>
+                                            </span>
+                                            <%= session.waStatus %>
+                                        </div>
+                                        
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="d-flex">
+                                                <iconify-icon icon="octicon:package-24" class="text-xl"></iconify-icon>
+                                            </span>
+                                            <%= session.packageName%>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="d-flex">
+                                                <iconify-icon icon="mdi:encryption-expiration" class="text-xl"></iconify-icon>
+                                            </span>
+                                            <%= session.packageExpired%>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <a href="/device/edit/<%= session.botPhoneNumber%>" class="btn btn-primary border border-primary-600 text-md px-24 py-8 radius-8 w-100 text-center">
+                                            Edit
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+            <% } else { %> 
+                tidak ada
+            <% } %> 
+        </div>
+    </div>
+    <%- include('../partials/footer') %>

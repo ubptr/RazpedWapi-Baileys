@@ -1,0 +1,137 @@
+<%- include('../partials/header') %>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+            <h6 class="fw-semibold mb-0">Baru</h6>
+            <ul class="d-flex align-items-center gap-2">
+                <li class="fw-medium">
+                    <a href="index.php" class="d-flex align-items-center gap-1 hover-text-primary">
+                        <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+                        Device
+                    </a>
+                </li>
+                <li>-</li>
+                <li class="fw-medium">Baru</li>
+            </ul>
+        </div>
+
+        <div class="row">
+            <% services.forEach(service => { %>
+                <div class="col-xl-3">
+                    <div class="card h-100 radius-12 bg-gradient-primary">
+                        <div class="card-body p-24">
+                            <div class="text-center">
+                                <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
+                                    <iconify-icon icon="ri:computer-fill" class="h5 mb-0"></iconify-icon>
+                                </div>
+                                <h6 class="mb-8"><%= service.type %> <%= service.duration %></h6>
+                            <p class="card-text mb-8 text-secondary-light">
+                                Rp <%= service.price.toLocaleString() %>
+                            </p>
+                            </div>
+                            <p class="">
+                                <% service.description.split('<br>').forEach((feature) => { %>
+                                    <% if (feature.startsWith('✅')) { %>
+                                        <span class="text-success"><%= feature %></span><br />
+                                    <% } else if (feature.startsWith('❌')) { %>
+                                        <span class="text-danger"><%= feature %></span><br />
+                                    <% } else { %>
+                                        <%= feature %><br />
+                                    <% } %>
+                                <% }); %>
+                            </p>
+                            
+                            <div class="d-flex justify-content-center">
+                                <button type="button"  data-bs-toggle="modal" data-bs-target="#exampleModal" data-package-id="<%= service.id %>" data-package-type="<%= service.serviceType %> <%= service.duration %>" 
+                                    class="btn rounded-pill btn-primary-600 radius-8 px-20 py-11 d-flex align-items-center gap-2">
+                                    Pilih Paket
+                                    <iconify-icon icon="mingcute:square-arrow-right-line" class="text-xl"></iconify-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>        
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-dialog modal-dialog-centered">
+                <div class="modal-content radius-16 bg-base">
+                    <div class="modal-header py-16 px-24 border border-top-0 border-start-0 border-end-0">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Tambah Perangkat</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-24">
+                        <form method="POST">
+                            <input type="hidden" name="deviceId" value="">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label class="form-label">Nama Perangkat</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-base">
+                                            <iconify-icon icon="f7:person"></iconify-icon>
+                                        </span>
+                                        <input type="text" class="form-control flex-grow-1" placeholder="Razped" name="deviceName">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Nomor Perangkat</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-base">
+                                            <iconify-icon icon="solar:phone-calling-linear"></iconify-icon>
+                                        </span>
+                                        <input type="number" class="form-control flex-grow-1" value="628" name="devicePhone">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Jenis Paket</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-base">
+                                            <iconify-icon icon="solar:phone-calling-linear"></iconify-icon>
+                                        </span>
+                                        <input type="text" class="form-control flex-grow-1" placeholder="" readonly>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-12">
+                                    <label class="form-label">ChatBot</label>
+                                    <div class="form-switch switch-primary d-flex align-items-center gap-3">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="yes" checked="">
+                                        <label class="form-check-label line-height-1 fw-medium text-secondary-light" for="yes">Yes</label>
+                                    </div>
+                                </div> -->
+                                <div class="d-flex align-items-center justify-content-center gap-3 mt-24">
+                                    <button type="submit" class="btn rounded-pill btn-primary-600 radius-8 px-20 py-11 d-flex align-items-center gap-2">
+                                        Pesan Sekarang
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // Menangkap semua tombol "Pilih Paket"
+            const paketButtons = document.querySelectorAll('[data-bs-target="#exampleModal"]');
+        
+            // Menambahkan event listener untuk setiap tombol
+            paketButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    // Mengambil ID dan jenis paket dari tombol
+                    const packageId = event.target.getAttribute('data-package-id');
+                    const packageType = event.target.getAttribute('data-package-type');
+                    
+                    // Mengisi input hidden dengan ID paket yang dipilih
+                    const deviceIdInput = document.querySelector('#exampleModal input[name="deviceId"]');
+                    if (deviceIdInput) {
+                        deviceIdInput.value = packageId; // Mengisi input dengan ID paket
+                    }
+        
+                    // Mengisi input readonly dengan jenis paket
+                    const packageTypeInput = document.querySelector('#exampleModal input[readonly]');
+                    if (packageTypeInput) {
+                        packageTypeInput.value = packageType; // Mengisi input dengan jenis paket
+                    }
+                });
+            });
+        </script>
+        
+    <%- include('../partials/footer') %>

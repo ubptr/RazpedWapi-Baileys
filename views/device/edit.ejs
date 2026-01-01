@@ -1,0 +1,689 @@
+<%- include('../partials/header') %>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">Device <font class="text-primary">#<%=session.botName%>
+            </font>
+        </h6>
+        <ul class="d-flex align-items-center gap-2">
+            <li class="fw-medium">
+                <a href="index.php" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+                    Device
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">
+                <%=session.botName%>
+            </li>
+        </ul>
+    </div>
+    <div class="row gy-4">
+        <div class="col-lg-4">
+            <div class="card radius-12 h-100">
+                <div
+                    class="card-header py-16 px-24 bg-base d-flex align-items-center gap-1 justify-content-between border border-end-0 border-start-0 border-top-0">
+                    <h6 class="text-lg mb-0">Logs:</h6>
+                </div>
+                <div class="card-body py-16 px-24">
+                    <div class="scroll-sm mb-16">
+                        <div class="table-responsive" style="max-height: 380px; overflow: auto;">
+                            <table class="table bordered-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logTableBody">
+                                    <tr>
+                                        <td>No logs yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="" id="PairingCode"></div>
+                    <div class="alert alert-primary bg-transparent border-primary-100 mb-0 fw-semibold text-lg radius-8"
+                        style="display: none;" id="NotSesi">
+                        <div class="text-center">
+                            <h5 class="fw-bold">QR Code:</h5>
+                            <<span class="bg-transparent border-primary-400 radius-12 px-24">
+                                <img src="" alt="QR Code" id="qrcode" />
+                            </span>
+                            <p> WhatsApp > Perangkat Tertaut > Tautkan Perangkat </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-body p-24">
+                    <ul class="nav border-gradient-tab nav-pills mb-20 d-inline-flex" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link d-flex align-items-center gap-2 px-24 active"
+                                id="pills-edit-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-edit-profile"
+                                type="button" role="tab" aria-controls="pills-edit-profile" aria-selected="true">
+                                <iconify-icon icon="bx:qr" class="text-xl"></iconify-icon> Koneksi WhatsApp
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link d-flex align-items-center gap-2 px-24"
+                                id="pills-change-passwork-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-change-passwork" type="button" role="tab"
+                                aria-controls="pills-change-passwork" aria-selected="false" tabindex="-1">
+                                <iconify-icon icon="uil:setting" class="text-xl"></iconify-icon> Pengaturan Akun
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-16 py-10" id="pills-profile-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
+                                aria-selected="false">Kirim pesan</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade active show" id="pills-edit-profile" role="tabpanel"
+                            aria-labelledby="pills-edit-profile-tab" tabindex="0">
+                            <div id="chooseMethod">
+                                <h6 class="text-md text-primary-light mb-16"> Metode Login WhatsApp</h6>
+                                <div class="row mb-16">
+                                    <div class="col-6">
+                                        <select id="loginMethod" class="form-select radius-8">
+                                            <option selected>- Pilih Metode Scan QR / Pairing Code</option>
+                                            <option value="qr">Scan QR Code</option>
+                                            <option value="pairing">Pairing Code</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" id="startWhatsapp"
+                                            class="btn btn-primary border border-primary-600 text-md px-12 py-8 radius-8">
+                                            Mulai Sesi
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="alert alert-primary bg-primary-50 text-primary-600 border-primary-600 border-start-width-4-px border-top-0 border-end-0 border-bottom-0 px-24 py-13 mb-0 fw-semibold text-lg radius-4 mb-16">
+                                <div class="d-flex align-items-center justify-content-between gap-8 flex-wrap">
+                                    <div class="d-flex align-items-center" id="waInfo">
+                                        <img src="https://cdn-icons-png.flaticon.com/128/3135/3135715.png" alt=""
+                                            class="flex-shrink-0 me-12 w-40-px h-40-px rounded-circle me-12">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-md mb-0 fw-semibold">Razer Pedia</h6>
+                                            <span
+                                                class="text-sm text-secondary-light fw-normal">6285338410674:20@s.whatsapp.net</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-start gap-3 mb-16">
+                                        <button type="button"
+                                            class="border border-success-600 bg-success-200 text-success-600 text-md px-12 py-8 radius-8"
+                                            id="waStatusBadge">
+                                            <%=session.waStatus%>
+                                        </button>
+                                        <button type="button" id="deleteSession"
+                                            class="border border-danger-600 bg-danger-200 text-danger-600 text-md px-12 py-8 radius-8">
+                                            Putuskan Sambungan
+                                        </button>
+
+                                        <button id="restartSession"
+                                            class="border border-warning-600 bg-warning-600 text-white text-md px-12 py-8 radius-8"
+                                            style="display:none">
+                                            Restart
+                                        </button>
+
+                                    </div>
+                                    <!-- <button type="button" class="btn bg-primary-600 border-primary-600 text-white px-24 rounded-pill follow-btn transition-2">Follow</button> -->
+                                </div>
+                            </div>
+
+
+
+                            <!-- <div class="d-flex align-items-center justify-content-start gap-3 mb-16">
+                                <button type="button" id="deleteSession"
+                                    class="border border-danger-600 bg-danger-200 text-danger-600 text-md px-12 py-8 radius-8">
+                                    Putuskan Sambungan
+                                </button>
+
+                                <button id="restartSession"
+                                    class="btn btn-warning border border-warning-600 text-md px-12 py-8 radius-8"
+                                    style="display:none">
+                                    Restart
+                                </button>
+
+                            </div> -->
+                            <h6>Detail Paket</h6>
+                            <ul>
+                                <li class="d-flex align-items-center gap-1 mb-12">
+                                    <span class="w-30 text-md fw-semibold text-primary-light">Nama Paket</span>
+                                    <span class="w-70 text-secondary-light fw-medium">: <%=session.botName%></span>
+                                </li>
+                                <li class="d-flex align-items-center gap-1 mb-12">
+                                    <span class="w-30 text-md fw-semibold text-primary-light">Nomor Bot</span>
+                                    <span class="w-70 text-secondary-light fw-medium">: <%=session.botPhoneNumber%>
+                                    </span>
+                                </li>
+                                <li class="d-flex align-items-center gap-1 mb-12">
+                                    <span class="w-30 text-md fw-semibold text-primary-light"> Jenis Paket</span>
+                                    <span class="w-70 text-secondary-light fw-medium">: <%=session.packageName%></span>
+                                </li>
+                                <li class="d-flex align-items-center gap-1 mb-12">
+                                    <span class="w-30 text-md fw-semibold text-primary-light"> Durasi Paket</span>
+                                    <span class="w-70 text-secondary-light fw-medium">: <%=session.packageDuration%>
+                                            hari</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-1 mb-12">
+                                    <span class="w-30 text-md fw-semibold text-primary-light"> Status Paket</span>
+                                    <span class="w-70 text-secondary-light fw-medium">: <%=session.packageStatus%>
+                                    </span>
+                                </li>
+                            </ul>
+
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-change-passwork" role="tabpanel"
+                            aria-labelledby="pills-change-passwork-tab" tabindex="0">
+                            <div class="mb-20">
+                                <label for="personalWebhookUrl"
+                                    class="form-label fw-semibold text-primary-light text-sm mb-8"> URL Webhook
+                                    Private Chat <span class="text-danger-600">*</span></label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control radius-8" id="personalWebhookUrl"
+                                        value="<%=session.personalWebhookUrl%>" placeholder="URL Webhook*">
+                                </div>
+                            </div>
+                            <div class="mb-20">
+                                <label for="groupWebhookUrl"
+                                    class="form-label fw-semibold text-primary-light text-sm mb-8">URL Webhook Group
+                                    Chat <span class="text-danger-600">*</span></label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control radius-8" id="groupWebhookUrl"
+                                        value="<%=session.groupWebhookUrl%>" placeholder="URL Webhook*">
+                                </div>
+                            </div>
+                            <!-- <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="autoRead">
+                                <label class="form-check-label">Auto Read (Last Seen)</label>
+                            </div>
+
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="typingReply">
+                                <label class="form-check-label">Mengetik sebelum membalas</label>
+                            </div> -->
+
+                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                <button type="button"
+                                    class="border border-danger-600 bg-hover-danger-200 text-danger-600 text-md px-56 py-11 radius-8">
+                                    Cancel
+                                </button>
+                                <button type="button" id="saveWebhookBtn"
+                                    class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-8">
+                                    Save
+                                </button>
+                            </div>
+
+                        </div>
+                        <div class="tab-pane fade" id="pills-profile" role="tabpanel"
+                            aria-labelledby="pills-profile-tab" tabindex="0">
+                            <div>
+                                <ul class="nav border-gradient-tab nav-pills mb-20 d-inline-flex" id="" role="tablist">
+                                    <li class="nav-item">
+                                        <button class="nav-link active" data-bs-toggle="pill"
+                                            data-bs-target="#tab-send">
+                                            📤 Kirim Pesan
+                                        </button>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-autoreply">
+                                            🤖 Autoreply
+                                        </button>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-blast">
+                                            📢 Pesan Blast
+                                        </button>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-group">
+                                            👥 Group / Channel
+                                        </button>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-contact">
+                                            📇 Kontak
+                                        </button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+
+                                    <!-- ================= KIRIM PESAN ================= -->
+                                    <div class="tab-pane fade show active" id="tab-send">
+                                        <div class="card radius-12">
+                                            <div class="card-body">
+                                                <h5 class="mb-12">📤 Kirim Pesan WhatsApp</h5>
+
+                                                <div class="mb-12">
+                                                    <label class="form-label">Nomor Tujuan</label>
+                                                    <input type="text" id="sendTo" class="form-control"
+                                                        placeholder="628xxxxxxxxxx">
+                                                </div>
+                                                <!-- <input type="file" id="mediaFile" class="form-control mt-8"> -->
+
+                                                <div class="mb-12">
+                                                    <label class="form-label">Pesan</label>
+                                                    <textarea id="sendMessage" class="form-control" rows="4"
+                                                        placeholder="Tulis pesan..."></textarea>
+                                                </div>
+
+                                                <button id="btnSendMessage" class="btn btn-primary">
+                                                    🚀 Kirim Pesan
+                                                </button>
+
+                                                <div id="sendStatus" class="mt-12 text-sm"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ================= AUTOREPLY ================= -->
+                                    <div class="tab-pane fade" id="tab-autoreply">
+                                        <div class="alert alert-info">
+                                            Fitur Autoreply (coming soon)
+                                        </div>
+                                    </div>
+
+                                    <!-- ================= BLAST ================= -->
+                                    <div class="tab-pane fade" id="tab-blast">
+                                        <div class="alert alert-warning">
+                                            Fitur Pesan Blast (coming soon)
+                                        </div>
+                                    </div>
+
+                                    <!-- ================= GROUP ================= -->
+                                    <div class="tab-pane fade" id="tab-group">
+                                        <div class="alert alert-secondary">
+                                            Fitur Group / Channel (coming soon)
+                                        </div>
+                                    </div>
+
+                                    <!-- ================= KONTAK ================= -->
+                                    <div class="tab-pane fade" id="tab-contact">
+                                        <div class="alert alert-light">
+                                            Manajemen Kontak (coming soon)
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // =========================
+            // SEND MESSAGE
+            // =========================
+
+
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            const socket = io()
+            const username = "<%= session.botPhoneNumber %>"
+            socket.emit('join_wa_room', username)
+            let checking = false
+            let lastSessionState = null // 'CONNECTED' | 'DISCONNECTED' | 'PAIRING'
+            let pendingTimer = null
+
+            if (!username) {
+                alert("Username tidak ditemukan")
+                return
+            }
+
+            // =========================
+            // HELPER
+            // =========================
+            function log(msg) {
+                $("#logTableBody").prepend(
+                    $("<tr>").append($("<td>").text(msg))
+                )
+            }
+
+            function resetUI() {
+                // $("#qrcode").hide().attr("src", "")
+                $("#PairingCode").hide().empty()
+
+                $("#waInfo").html(`
+                <img src="https://cdn-icons-png.flaticon.com/128/3135/3135715.png" alt=""
+                                            class="flex-shrink-0 me-12 w-40-px h-40-px rounded-circle me-12">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-md mb-0">Belum terhubung</h6>
+                                            <span
+                                                class="text-sm text-secondary-light fw-normal">Silakan mulai sesi</span>
+                                        </div>
+                `)
+
+                $("#startWhatsapp").show()
+                $("#deleteSession, #restartSession").hide()
+
+                $("#SesiAda").hide()
+                $("#chooseMethod").show()
+                // $("#NotSesi").show()
+            }
+            function startPendingTimeout() {
+                if (pendingTimer) clearTimeout(pendingTimer)
+
+                pendingTimer = setTimeout(() => {
+                    log("⌛ Timeout: sesi tidak diselesaikan, dibatalkan")
+                    socket.emit("cancel_pending_session", username)
+                    resetUI()
+                }, 120000) // 60 detik
+            }
+
+
+            // =========================
+            // CHECK SESSION ON LOAD
+            // =========================
+            function checkSession() {
+                if (checking) return
+                checking = true
+                socket.emit("check_session", username)
+                setTimeout(() => checking = false, 1000)
+            }
+
+            checkSession()
+            // =========================
+            // RESET SESSION SAAT GANTI METODE LOGIN
+            // =========================
+            $("#loginMethod").on("change", function () {
+                log("🔄 Metode login diganti, reset sesi pending")
+
+                socket.emit("cancel_pending_session", username)
+
+                // bersihkan UI lokal
+                $("#qrcode").hide().attr("src", "")
+                $("#PairingCode").hide().empty()
+
+                lastSessionState = null
+            })
+            // auto check tiap 5 detik
+            // setInterval(checkSession, 5000)
+            socket.on("session_exists", () => setStatus("CONNECTED"))
+            socket.on("wa:pairing-code", () => setStatus("PAIRING"))
+            socket.on("session_not_exists", () => setStatus("DISCONNECTED"))
+            socket.on("session_deleted", () => setStatus("DISCONNECTED"))
+
+            socket.on("session_exists", function (info) {
+                lastSessionState = 'CONNECTED'
+                $("#NotSesi, #PairingCode, #qrcode").hide()
+
+                $("#waInfo").html(`
+                <img src="${info.profilePicUrl}" alt="" class="flex-shrink-0 me-12 w-40-px h-40-px rounded-circle me-12">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-md mb-0">${info.pushname}</h6>
+                                            <span
+                                                class="text-sm text-secondary-light fw-normal">${info.wid}</span>
+                                        </div>
+                `)
+
+                $("#startWhatsapp").hide()
+                $("#deleteSession, #restartSession").show()
+
+                log("Sesi WhatsApp aktif")
+                $('#chooseMethod').hide();
+            })
+
+            socket.on("session_not_exists", function () {
+                if (lastSessionState !== 'DISCONNECTED') {
+                    log("Belum ada sesi WhatsApp")
+                    lastSessionState = 'DISCONNECTED'
+                }
+                resetUI()
+            })
+
+
+            // =========================
+            // START SESSION
+            // =========================
+            $("#startWhatsapp").on("click", function () {
+                const method = $("#loginMethod").val()
+
+                socket.emit("wa:start", {
+                    username,
+                    method,
+                    phone: $("#pairingPhone").val() || null
+                })
+
+                log(`Memulai sesi WhatsApp ${method}...`)
+            })
+
+            // =========================
+            // QR
+            // =========================
+            socket.on("wa:qr", function (qr) {
+                // startPendingTimeout()
+                $("#NotSesi").show()
+                $("#qrcode").show()
+                    .attr("src",
+                        "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" +
+                        encodeURIComponent(qr)
+                    )
+                log("QR Code diterima")
+            })
+
+            // =========================
+            // PAIRING
+            // =========================
+            socket.on("wa:pairing-code", function (code) {
+                startPendingTimeout()
+                $("#NotSesi").hide()
+                $("#qrcode").hide()
+
+                $("#PairingCode").show().html(`
+                <div class="alert alert-success bg-success-100 text-success-600 border-success-100 mb-0 fw-semibold text-lg radius-8">
+                        <div class="text-center">
+                            <h5 class="text-success fw-bold">Pairing Code</h5>
+                            <span class="bg-success-600 radius-4 px-24">
+                                <h2 class="text-white">${code}</h2>
+                            </span>
+                            <p> WhatsApp > Perangkat Tertaut > Tautkan Perangkat </p>
+                        </div>
+                    </div> `)
+
+                log("Pairing code dikirim")
+            })
+
+            // =========================
+            // READY
+            // =========================
+            socket.on("wa:ready", function (info) {
+                if (pendingTimer) {
+                    clearTimeout(pendingTimer)
+                    pendingTimer = null
+                }
+                log("WhatsApp berhasil terhubung")
+                checkSession()
+            })
+
+            // =========================
+            // DELETE SESSION
+            // =========================
+            $("#deleteSession").on("click", function () {
+                new bootstrap.Modal("#confirmDeleteModal").show()
+            })
+
+            $("#confirmDeleteBtn").on("click", function () {
+                socket.emit("delete_session", username)
+                bootstrap.Modal.getInstance(
+                    document.getElementById("confirmDeleteModal")
+                ).hide()
+                log("🧹 Menghapus sesi…")
+            })
+
+
+            socket.on("session_deleted", function () {
+                log("Sesi dihapus total")
+                resetUI()
+            })
+
+            // =========================
+            // RESTART SESSION
+            // =========================
+            $("#restartSession").on("click", function () {
+                log("Merestart sesi WhatsApp...")
+                socket.emit("restart_session", username)
+            })
+
+            socket.on("session_restarted", function () {
+                log("Restart berhasil, menunggu koneksi ulang...")
+                resetUI()
+            })
+
+            // =========================
+            // ERROR
+            // =========================
+            socket.on("error", function (err) {
+                log("Error: " + err)
+            })
+            function setStatus(status) {
+                const badge = $("#waStatusBadge")
+
+                badge.removeClass("bg-success bg-warning bg-danger bg-secondary")
+
+                if (status === "CONNECTED") {
+                    badge.addClass("bg-success").text("CONNECTED")
+                } else if (status === "PAIRING") {
+                    badge.addClass("bg-warning").text("PAIRING")
+                } else {
+                    badge.addClass("bg-danger").text("DISCONNECTED")
+                }
+            }
+
+
+            $("#btnSendMessage").on("click", function () {
+                const to = $("#sendTo").val().trim()
+                const message = $("#sendMessage").val().trim()
+
+                if (!to || !message) {
+                    $("#sendStatus").html(
+                        `<span class="text-danger">Nomor & pesan wajib diisi</span>`
+                    )
+                    return
+                }
+
+                socket.emit("wa:send-message", {
+                    username,
+                    to,
+                    message
+                })
+
+                $("#sendStatus").html(
+                    `<span class="text-secondary">⏳ Mengirim pesan...</span>`
+                )
+            })
+
+            // response sukses
+            socket.on("wa:message-sent", () => {
+                $("#sendStatus").html(
+                    `<span class="text-success">✅ Pesan terkirim</span>`
+                )
+                log(`✅ Pesan terkirim`)
+                $("#sendMessage").val("")
+            })
+
+            // response gagal
+            socket.on("wa:message-failed", (err) => {
+                $("#sendStatus").html(
+                    `<span class="text-danger">❌ Gagal: ${err}</span>`
+                )
+            })
+            $("#saveWebhookBtn").click(function () {
+                const personalWebhookUrl = $('#personalWebhookUrl').val();
+                const groupWebhookUrl = $('#groupWebhookUrl').val();
+
+                if (!personalWebhookUrl || !groupWebhookUrl) {
+                    alert("URL Webhook tidak boleh kosong!");
+                    return;
+                }
+
+                if (!username) {
+                    alert("Username/Phone Number tidak ditemukan!");
+                    return;
+                }
+
+                const data = {
+                    phoneNumber: username,  // Use the correct phone number or username value
+                    personalWebhookUrl: personalWebhookUrl,
+                    groupWebhookUrl: groupWebhookUrl,
+                    act: 'saveWebhook'
+                };
+                $.ajax({
+                    url: '/ajax/device',
+                    data: data,
+                    type: 'POST',
+                    dataType: 'html',
+                    success: function (msg) {
+                        Swal.fire({
+                            title: "Good job!",
+                            text: 'Data Berhasil di Update',
+                            icon: "success"
+                        });
+                    },
+                    error: function (msg) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong!"
+                        });
+                    }
+                });
+                // Send AJAX request to save webhook URLs
+
+            });
+            $("#autoRead, #typingReply").on("change", function () {
+                socket.emit("wa:update-setting", {
+                    username,
+                    autoRead: $("#autoRead").is(":checked"),
+                    typingReply: $("#typingReply").is(":checked")
+                })
+            })
+
+        })
+    </script>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Hapus Sesi WhatsApp</h5>
+                </div>
+                <div class="modal-body">
+                    Sesi WhatsApp akan dihapus permanen. Lanjutkan?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    <button class="btn btn-danger" id="confirmDeleteBtn">
+                        Ya, Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <%- include('../partials/footer') %>

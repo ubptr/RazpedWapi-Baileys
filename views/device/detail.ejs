@@ -1,0 +1,169 @@
+<%- include('partials/header') %>
+
+  <div class="dashboard-main-body">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+      <h6 class="fw-semibold mb-0">Analytics</h6>
+      <ul class="d-flex align-items-center gap-2">
+        <li class="fw-medium">
+          <a href="index.php" class="d-flex align-items-center gap-1 hover-text-primary">
+            <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+            Dashboard
+          </a>
+        </li>
+        <li>-</li>
+        <li class="fw-medium">Analytics</li>
+      </ul>
+    </div>
+
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="row">
+          <div class="col-12 mb-4">
+            <button type="button" id="startWhatsapp" class="btn btn-primary w-100">
+              Starta
+            </button>
+          </div>
+          <div class="col-12">
+            <button type="button" id="deleteSession" class="btn btn-danger w-100">
+              Delete Session
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mb-16">
+  <label class="form-label fw-semibold">Metode Login</label>
+  <select id="loginMethod" class="form-select">
+    <option value="qr">QR Code</option>
+    <option value="pairing">Pairing Code</option>
+  </select>
+</div>
+
+<div class="mb-16" id="pairingBox" style="display:none">
+  <label class="form-label fw-semibold">Nomor WhatsApp</label>
+  <input
+    type="text"
+    id="pairingPhone"
+    class="form-control"
+    placeholder="628xxxxxxxxxx"
+  />
+</div>
+
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Sesi WhatsApp</h4>
+          </div>
+          <div class="card-body">
+            <div id="SesiAda" style="display: none">
+              <h6>Info Akun:</h6>
+              <div id="waInfo"></div>
+            </div>
+            <div id="NotSesi">
+              <h6>QR Code:</h6>
+              <img src="" alt="QR Code" id="qrcode" />
+            </div>
+            <h6>Logs:</h6>
+            <div class="table-responsive scroll-sm">
+              <table class="table bordered-table mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="logTableBody">
+                  <tr>
+                    <td>No logs yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    $(document).ready(function () {
+      const socket = io()
+      const username = "<%= username %>"
+
+      if (!username) {
+        alert("Username tidak ditemukan. Harap login ulang.")
+        return
+      }
+
+      // cek status session saat load
+      socket.emit("wa:check", { username })
+
+      $("#startWhatsapp").on("click", function () {
+        socket.emit("wa:start", { username })
+        log("Memulai sesi WhatsApp…")
+      })
+
+      $("#deleteSession").on("click", function () {
+        socket.emit("wa:delete", { username })
+        log("Menghapus sesi…")
+      })
+
+      // ===== EVENT DARI BAILEYS =====
+
+      socket.on("wa:qr", function (qr) {
+        $("#SesiAda").hide()
+        $("#NotSesi").show()
+        $("#qrcode").show().empty()
+
+        QRCode.toCanvas(
+          document.getElementById("qrcode"),
+          qr,
+          { width: 250 },
+          function (error) {
+            if (error) console.error(error)
+          }
+        )
+
+        log("QR diterima, silakan scan")
+      })
+
+      socket.on("wa:ready", function (info) {
+        $("#NotSesi").hide()
+        $("#SesiAda").show()
+
+        log("WhatsApp berhasil terhubung")
+
+        $("#waInfo").html(`
+        <div class="card radius-12 overflow-hidden shadow h-100 d-flex flex-row">
+          <div class="card-body p-16">
+            <h5 class="card-title text-primary-light">Data Akun</h5>
+            <p class="mb-1">Nama: ${info.name || "-"}</p>
+            <p class="mb-0">JID: ${info.id}</p>
+          </div>
+        </div>
+      `)
+      })
+
+      socket.on("wa:status", function (msg) {
+        log(msg)
+      })
+
+      socket.on("wa:deleted", function () {
+        log("Sesi berhasil dihapus")
+        $("#SesiAda").hide()
+        $("#NotSesi").show()
+        $("#waInfo").empty()
+      })
+
+      socket.on("wa:error", function (err) {
+        log("Error: " + err)
+      })
+
+      function log(message) {
+        $("#logTableBody").append(
+          $("<tr>").append($("<td>").text(message))
+        )
+      }
+    })
+  </script>
+
+  <%- include('partials/footer') %>

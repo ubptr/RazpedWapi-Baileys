@@ -1,0 +1,76 @@
+const initializeSocket = (server) => {
+    io = socketIO(server);
+    
+    io.on('connection', (socket) => {
+        console.log('User terhubung ke WebSocket.');
+
+        socket.on('start_session', (username) => {
+            if (!sessions[username]) {
+                const client = new Client({
+                    authStrategy: new LocalAuth({ clientId: username }),
+                    puppeteer: {
+                        headless: true,
+                        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                    }
+                });
+
+                // client.on('qr', (qr) => {
+                //     console.log(`QR Code untuk ${username}: ${qr}`);
+                //     socket.emit('qr', `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qr}`);
+                // });
+                client.on('qr', async (qr) => {
+                    try {
+                        const url = await qrcode.toDataURL(qr);
+                        socket.emit('qr', url);  // Kirim QR code baru ke klien
+                        socket.emit('message', 'QR Code received, scan please!');
+                        console.log('QR Code generated and sent to client.');
+                    } catch (err) {
+                        console.error('Error generating QR code:', err);
+                        socket.emit('message', 'Error generating QR code.');
+                    }
+                });
+                
+                client.on('ready', () => {
+                    console.log(`WhatsApp ${username} siap digunakan.`);
+                    socket.emit('message', `WhatsApp ${username} siap.`);
+                });
+
+                client.on('authenticated', (session) => {
+                    console.log(`WhatsApp ${username} berhasil login.`);
+                    client.getState().then(() => {
+                        client.getMe().then((info) => {
+                            socket.emit('authenticated', {
+                                wid: info.wid,
+                                pushname: info.pushname,
+                            });
+                        });
+                    });
+                });
+
+                client.on('disconnected', () => {
+                    console.log(`WhatsApp ${username} terputus.`);
+                    delete sessions[username];
+                });
+
+                client.initialize();
+                sessions[username] = client;
+            }
+        });
+
+        socket.on('delete_session', () => {
+            const username = "user1"; // Ganti sesuai login
+            const sessionPath = path.join(__dirname, '../session/Default', username);
+
+            if (fs.existsSync(sessionPath)) {
+                fs.rmSync(sessionPath, { recursive: true, force: true });
+            }
+
+            if (sessions[username]) {
+                sessions[username].destroy();
+                delete sessions[username];
+            }
+
+            socket.emit('message', 'Session berhasil dihapus.');
+        });
+    });
+};

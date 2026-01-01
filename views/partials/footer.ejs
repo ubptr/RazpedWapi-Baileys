@@ -1,0 +1,71 @@
+
+</div>
+<footer class="d-footer">
+    <div class="row align-items-center justify-content-between">
+        <div class="col-auto">
+            <p class="mb-0">© 2025 <%= webSettings.title %>. All Rights Reserved.</p>
+        </div>
+        <div class="col-auto">
+            <p class="mb-0">Made by <span class="text-primary-600">UllungArt</span></p>
+        </div>
+    </div>
+</footer>
+</main>
+<!-- jQuery library js -->
+
+<!-- Bootstrap js -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="<%= app_url %>library/js/lib/bootstrap.bundle.min.js"></script>
+<!-- Apex Chart js -->
+<script src="<%= app_url %>library/js/lib/apexcharts.min.js"></script>
+<!-- Data Table js -->
+<script src="<%= app_url %>library/js/lib/dataTables.min.js"></script>
+<!-- Iconify Font js -->
+<script src="<%= app_url %>library/js/lib/iconify-icon.min.js"></script>
+<!-- jQuery UI js -->
+<script src="<%= app_url %>library/js/lib/jquery-ui.min.js"></script>
+<!-- Vector Map js -->
+<script src="<%= app_url %>library/js/lib/jquery-jvectormap-2.0.5.min.js"></script>
+<script src="<%= app_url %>library/js/lib/jquery-jvectormap-world-mill-en.js"></script>
+<!-- Popup js -->
+<script src="<%= app_url %>library/js/lib/magnifc-popup.min.js"></script>
+<!-- Slick Slider js -->
+<script src="<%= app_url %>library/js/lib/slick.min.js"></script>
+<!-- prism js -->
+<script src="<%= app_url %>library/js/lib/prism.js"></script>
+<!-- file upload js -->
+<script src="<%= app_url %>library/js/lib/file-upload.js"></script>
+<!-- audioplayer -->
+<script src="<%= app_url %>library/js/lib/audioplayer.js"></script>
+
+<!-- main js -->
+<script src="<%= app_url %>library/js/app.js"></script>
+
+<script>
+    $(document).ready(function() {
+        function formatSelect2Option(data) {
+            if (!data.id) {
+                return data.text;
+            }
+            var icon = $(data.element).attr('data-icon');
+            if (icon) {
+                return $('<span><i class="' + icon + '"></i> ' + data.text + '</span>');
+            } else {
+                return data.text;
+            }
+        }
+            // Inisialisasi Select2 untuk elemen non-modal
+            $('.select2').select2();
+
+            // Inisialisasi Select2 untuk elemen dalam modal
+            $(".modal").on('shown.bs.modal', function() {
+                $(this).find('.select2').select2({
+                    templateSelection: formatSelect2Option,
+                    templateResult: formatSelect2Option,
+                    dropdownParent: $(this)
+                });
+            });
+        });
+</script>
+</body>
+</html>

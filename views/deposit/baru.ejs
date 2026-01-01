@@ -1,0 +1,168 @@
+<%- include('../partials/header') %>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">Baru</h6>
+        <ul class="d-flex align-items-center gap-2">
+            <li class="fw-medium">
+                <a href="<%= app_url %>" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+                    Deposit
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">Baru</li>
+        </ul>
+    </div>
+    <div class="row gy-3">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center gap-1 mb-12">
+                        <iconify-icon icon="bxs:wallet" class="text-xxl"></iconify-icon>
+                        <h6 class="text-lg mb-0"> Deposit Baru</h6>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="row gy-3">
+                            <div class="col-12">
+                                <label class="form-label">Jenis Pembayaran</label>
+                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                    <button type="button" data-id="method_btn" data-type="Bank"
+                                        class="btn d-flex items-center align-middle text-white btn-primary-600">
+                                        <iconify-icon icon="mdi:bank" class="text-xxl"></iconify-icon>
+                                        <span class="ml-1">BANK</span>
+                                    </button>
+                                    <button type="button" data-id="method_btn" data-type="Emoney"
+                                        class="btn d-flex items-center align-middle text-white btn-primary-600">
+                                        <iconify-icon icon="flowbite:wallet-outline" class="text-xxl"></iconify-icon>
+                                        <span class="ml-1">E-WALLET</span>
+                                    </button>
+                                    <button type="button" data-id="method_btn" data-type="Virtual Account"
+                                        class="btn d-flex items-center align-middle text-white btn-primary-600">
+                                        <iconify-icon icon="flowbite:wallet-outline" class="text-xxl"></iconify-icon>
+                                        <span class="ml-1">Virtual Account</span>
+                                    </button>
+
+                                    <button type="button" data-id="method_btn" data-type="Qris"
+                                        class="btn d-flex items-center align-middle text-white btn-primary-600">
+                                        <iconify-icon icon="bx:qr" class="text-xxl"></iconify-icon>
+                                        <span class="ml-2">QRIS</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gy-3" id="showForm">
+                            <div class="col-12">
+                                <label class="form-label">Channel Pembayaran</label>
+                                <div class="payment-group form-group">
+                                    <div class="row gy-2 gx-2" id="channelpembayaran">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Jumlah Deposit</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-base"> Rp </span>
+                                    <input type="number" name="amount" class="form-control"
+                                        placeholder="Jumlah Deposit">
+                                </div>
+                            </div>
+                            <div class="hstack gap-1 justify-content-end">
+                                <button type="reset"
+                                    class="btn btn-danger-600 radius-8 px-20 py-8 d-flex align-items-center gap-2">
+                                    <iconify-icon icon="ic:baseline-refresh" class="text-xl"></iconify-icon>Ulangi
+                                </button>
+                                <button type="submit"
+                                    class="btn btn-primary-600 radius-8 px-20 py-8 d-flex align-items-center gap-2">
+                                    <iconify-icon icon="mynaui:send-solid" class="text-xl"></iconify-icon>Deposit
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card radius-12 h-100">
+                <div
+                    class="card-header py-16 px-24 bg-base d-flex align-items-center gap-1 justify-content-between border border-end-0 border-start-0 border-top-0">
+                    <div class="d-flex align-items-center gap-2 mb-12">
+                        <iconify-icon icon="ic:twotone-info" class="text-xxl"></iconify-icon>
+                        <h6 class="text-lg mb-0">Informasi</h6>
+                    </div>
+                </div>
+                <div class="card-body py-16 px-24">
+                    <h6 class="card-title text-primary-light mb-8 text-lg">Cara Membuat Deposit Baru</h6>
+                    <ul class="list-decimal ps-20">
+                        <li>Pilih&nbsp;<i>Jenis Pembayaran</i>.</li>
+                        <li>Pilih&nbsp;<i>Metode Pembayaran</i>.</li>
+                        <li>Input&nbsp;<i>Jumlah Deposit</i>&nbsp;yang Anda inginkan.</li>
+                        <li>Transfer Pembayaran sesuai dengan nominal yang tertera.</li>
+                        <li>Saldo akan otomatis bertambah dalam beberapa menit apabila Anda menggunakan&nbsp;<i>Jenis
+                                Permintaan</i>&nbsp;<i><strong>OTOMATIS</strong></i>.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#showForm').hide();
+        document.addEventListener('DOMContentLoaded', function () {
+            const methodButtons = document.querySelectorAll('[data-type]');
+            const channelContainer = document.getElementById('channelpembayaran');
+
+            // Fungsi untuk mengambil channel pembayaran dari API
+            function fetchPaymentChannels(paymentType) {
+                fetch(`/ajax/payment-channels?type=${paymentType}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error(data.error);
+                            return;
+                        }
+                        updateChannels(data);  // Update tampilan dengan data yang diterima
+                    })
+                    .catch(error => {
+                        console.error('Error fetching payment channels:', error);
+                    });
+            }
+            // fetchPaymentChannels('Bank');
+            // Fungsi untuk mengupdate tampilan channel pembayaran
+            function updateChannels(channels) {
+                channelContainer.innerHTML = '';  // Kosongkan kontainer sebelum menambah channel baru
+                $('#showForm').show();
+                channels.forEach(channel => {
+                    const channelElement = document.createElement('div');
+                    channelElement.classList.add('col-12', 'col-lg-6', 'col-xl-4');
+                    channelElement.innerHTML = `
+                                                <div class="payment-menu h-100">
+                                                    <input id="${channel.id}" name="method" type="radio" class="form-check-input"
+                                                        value="${channel.id}">
+                                                    <label class="payment-item h-100" for="${channel.id}">
+                                                        <div class="info-top">
+                                                            <div>
+                                                                <img src="/library/media/icon/payment/02/${channel.img}" alt="${channel.provider}" width="80">
+                                                            </div>
+                                                        </div>
+                                                        <div class="info-bottom text-sm-left">
+                                                            <span class="fw-bolder">${channel.payment}</span>
+                                                            <div class="">${channel.note}</div>
+                                                        </div>
+                                                    </label>
+                                                </div>`;
+                    channelContainer.appendChild(channelElement);
+                });
+            }
+
+            // Menambahkan event listener untuk setiap tombol jenis pembayaran
+            methodButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const paymentType = button.getAttribute('data-type');
+                    fetchPaymentChannels(paymentType);  // Ambil data channel dari server berdasarkan jenis pembayaran
+                });
+            });
+        });
+    </script>
+    <%- include('../partials/footer') %>

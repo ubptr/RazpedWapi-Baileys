@@ -1,0 +1,153 @@
+<%- include('../../partials/header') %>
+
+<div class="dashboard-main-body">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">List</h6>
+    <ul class="d-flex align-items-center gap-2">
+      <li class="fw-medium">
+        <a href="/" class="d-flex align-items-center gap-1 hover-text-primary">
+          <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+          Dashboard
+        </a>
+      </li>
+      <li>-</li>
+      <li class="fw-medium">List Perangkat</li>
+    </ul>
+  </div>
+
+  <div class="card basic-data-table">
+    <div class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
+      <h5>Daftar Sesi WhatsApp</h5>
+      <button type="button" class="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addSessionModal">
+        <iconify-icon icon="ic:baseline-plus" class="icon text-xl line-height-1"></iconify-icon>
+        Tambah Sesi
+      </button>
+    </div>
+    <div class="card-body">
+      <table class="table bordered-table mb-0" id="dataTable" data-page-length="10">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Kontak</th>
+            <th>Paket</th>
+            <th>Status</th>
+            <th>Koneksi</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% sessions.forEach(session => { %>
+            <tr>
+              <td><%= session.id %></td>
+              <td>
+                <ul class="list-unstyled">
+                  <li><strong><%= session.name %></strong></li>
+                  <li><%= session.username %></li>
+                </ul>
+              </td>
+              <td>
+                <ul class="list-unstyled">
+                  <li>WID: <%= session.wid %></li>
+                  <li>PushName: <%= session.pushname %></li>
+                </ul>
+              </td>
+              <td>
+                <ul class="list-unstyled">
+                  <li>Paket: <%= session.packageName %></li>
+                  <li>Durasi: <%= session.packageDuration %> hari</li>
+                </ul>
+              </td>
+              <td>
+                <% if (session.packageStatus === 'Active') { %>
+                  <span class="badge bg-success">Active</span>
+                <% } else { %>
+                  <span class="badge bg-secondary"><%= session.packageStatus %></span>
+                <% } %>
+              </td>
+              <td>
+                
+              </td>
+              <td>
+                <button class="btn btn-sm btn-warning btn-edit-session" data-session='<%- JSON.stringify(session) %>'>Edit</button>
+                <form action="/admin/device/delete/<%= session.id %>" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus sesi ini?');">
+                  <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tambah Sesi -->
+<div class="modal fade" id="addSessionModal" tabindex="-1" aria-labelledby="addSessionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content radius-16 bg-base">
+      <form action="/admin/sessions/add" method="POST" class="p-24">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title">Tambah Sesi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" name="username" class="form-control mb-3" placeholder="Username" required>
+          <input type="text" name="botName" class="form-control mb-3" placeholder="Nama Bot" required>
+          <input type="text" name="botPhoneNumber" class="form-control mb-3" placeholder="Nomor Bot" required>
+          <input type="text" name="packageName" class="form-control mb-3" placeholder="Nama Paket">
+          <input type="number" name="packageDuration" class="form-control mb-3" placeholder="Durasi (hari)">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Sesi -->
+<div class="modal fade" id="editSessionModal" tabindex="-1" aria-labelledby="editSessionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content radius-16 bg-base">
+      <form id="editSessionForm" method="POST" class="p-24">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title">Edit Sesi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" name="botName" id="editBotName" class="form-control mb-3" required>
+          <input type="text" name="packageName" id="editPackageName" class="form-control mb-3">
+          <input type="number" name="packageDuration" id="editPackageDuration" class="form-control mb-3">
+          <select name="packageStatus" id="editPackageStatus" class="form-control mb-3">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Expired">Expired</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>
+<script>
+  let table = new DataTable("#dataTable");
+
+  document.querySelectorAll('.btn-edit-session').forEach(button => {
+    button.addEventListener('click', function () {
+      const data = JSON.parse(this.getAttribute('data-session'));
+      document.getElementById('editBotName').value = data.botName;
+      document.getElementById('editPackageName').value = data.packageName;
+      document.getElementById('editPackageDuration').value = data.packageDuration;
+      document.getElementById('editPackageStatus').value = data.packageStatus;
+      document.getElementById('editSessionForm').action = `/admin/sessions/edit/${data.id}`;
+      new bootstrap.Modal(document.getElementById('editSessionModal')).show();
+    });
+  });
+
+
+</script>

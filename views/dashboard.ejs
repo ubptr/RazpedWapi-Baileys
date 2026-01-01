@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard untuk mengelola sesi WhatsApp.">
+    <title>Dashboard WhatsApp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" crossorigin="anonymous"></script> -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; padding: 20px; }
+        #app { max-width: 600px; margin: 20px auto; }
+        #qrcode { display: none; width: 100%; margin: 10px 0; border: 1px solid #efefef; border-radius: 4px; }
+        ul.logs { max-height: 250px; padding: 15px; margin-top: 5px; border-radius: 4px; overflow-y: auto; background: #efefef; color: #666; font-size: 14px; }
+        ul.logs li:first-child { color: green; }
+        button { padding: 10px 15px; background-color: red; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+        button:hover { background-color: darkred; }
+        #startWhatsapp { background-color: green; }
+        #startWhatsapp:hover { background-color: darkgreen; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h2>Selamat Datang, <%= username %>!</h2>
+        <button id="startWhatsapp">Mulai WhatsApp</button>
+        <button id="deleteSession">Hapus Sesi</button>
+        
+        <h3>QR Code:</h3>
+        <img src="" alt="QR Code" id="qrcode">
+
+        <h3>Info Akun:</h3>
+        <ul id="waInfo"></ul>
+
+        <h3>Logs:</h3>
+        <ul class="logs"></ul>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            var socket = io();
+            let username = '<%= username %>';
+
+            if (!username || username === 'undefined') {
+                alert('Username tidak ditemukan. Harap login ulang.');
+                return;
+            }
+
+            // Cek apakah sesi WhatsApp sudah aktif
+            socket.emit('check_session', username);
+
+            // Jika sesi sudah ada, langsung tampilkan info akun
+            socket.on('session_exists', function (info) {
+                $('#qrcode').hide();
+                $('.logs').append($('<li>').text('Sesi sudah aktif, WhatsApp siap digunakan.'));
+                
+                $('#waInfo').html(`
+                    <li><strong>Nomor:</strong> ${info.wid}</li>
+                    <li><strong>Nama:</strong> ${info.pushname}</li>
+                `);
+            });
+
+            // Jika sesi belum ada, tetap lanjutkan dengan scan QR
+            $('#startWhatsapp').click(function () {
+                socket.emit('start_session', username);
+                $('.logs').append($('<li>').text('Memulai sesi untuk ' + username));
+            });
+
+            socket.on('qr', function (src) {
+                $('#qrcode').attr('src', src).show();
+                $('.logs').append($('<li>').text('QR Code diterima, silakan scan.'));
+            });
+
+            socket.on('message', function (msg) {
+                $('.logs').append($('<li>').text(msg));
+            });
+
+            socket.on('authenticated', function (info) {
+                $('#qrcode').hide();
+                $('.logs').append($('<li>').text('WhatsApp berhasil login.'));
+                
+                $('#waInfo').html(`
+                    <li><strong>Nomor:</strong> ${info.wid}</li>
+                    <li><strong>Nama:</strong> ${info.pushname}</li>
+                `);
+            });
+
+            $('#deleteSession').click(function () {
+                socket.emit('delete_session', username);
+                $('.logs').append($('<li>').text('Menghapus sesi...'));
+            });
+
+            socket.on('session_deleted', function () {
+                $('.logs').append($('<li>').text('Sesi berhasil dihapus.'));
+                $('#waInfo').empty();
+            });
+
+            socket.on('error', function (error) {
+                $('.logs').append($('<li>').text('Terjadi kesalahan: ' + error));
+            });
+        });
+    </script>
+</body>
+</html>
